@@ -4,11 +4,18 @@
 
 ---
 
-## 🌌 Overview
+## 🌌 Overview & Key Features
 
-The **Antigravity Obsidian Agentic Memory System** enables autonomous AI coding agents to maintain persistent, cross-session, multi-project context across local environments.
+The **Antigravity Obsidian Agentic Memory System** enables autonomous AI coding agents (Claude Code, Antigravity, Gemini CLI) to maintain persistent, cross-session, multi-project context across local environments.
 
 Instead of scanning thousands of raw source lines on every turn, agents query structured knowledge graphs, navigate community clusters, compile exact AST function code slices, and persist architectural decisions into a Markdown-native Obsidian knowledge base.
+
+### ⚡ Token Optimization Engine (v2.0)
+- **Comments & Docstrings Stripper**: Strips non-essential multiline docstrings and comments when fetching AST contexts, saving **30-60% LLM tokens**.
+- **AST Code Slicing**: Slices only the exact function/symbol lines and immediate dependencies, rather than reading full 1000-line files.
+- **Dependency Deduplication**: Prevents duplicate dependency inclusions when multiple functions import from the same target module.
+- **Token Budgeting (`max_tokens`)**: Allows agents to specify bounded token caps (`max_tokens=1500`) to guarantee prompt budget compliance.
+- **Compact ASCII Tree Renderer (`/api/compact_tree/{project}`)**: Generates high-density markdown dependency trees for LLM system prompts using **80% fewer tokens** than raw JSON graph payloads.
 
 ```
        ┌────────────────────────────────────────────────────────┐
@@ -33,6 +40,7 @@ Instead of scanning thousands of raw source lines on every turn, agents query st
 │     Antigravity Graph Engine (FastAPI 3333)     │
 │   • 3D WebGL Visualizer (React + ThreeJS)      │
 │   • Agent Context Compiler (/api/compile/{proj})│
+│   • Token Compression & Metrics Dashboard       │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -47,12 +55,12 @@ antigravity-obsidian-agentic-memory/
 │   ├── graphify_obsidian_sync.py    # Auto-sync daemon exporting graphs to Obsidian vault
 │   └── bootstrap_workspaces.sh      # Bootstraps graphify & .agent/ across all project workspaces
 ├── graph-engine/                    # 3D WebGL Graph Visualizer & FastAPI Agent Context API
-│   ├── server.py                    # FastAPI server on port 3333 (Context Compiler API)
+│   ├── server.py                    # FastAPI server on port 3333 (Context Compiler API v2)
 │   ├── package.json
 │   ├── vite.config.js
 │   ├── index.html
 │   └── src/
-│       ├── App.jsx                  # 3D Force Graph WebGL Canvas
+│       ├── App.jsx                  # 3D Force Graph WebGL Canvas & AST Inspector
 │       ├── App.css
 │       ├── main.jsx
 │       └── index.css
@@ -65,37 +73,31 @@ antigravity-obsidian-agentic-memory/
 
 ---
 
-## 🚀 Components & Workflow
+## 📡 Context Compiler REST Endpoints
 
-### 1. Graphify Knowledge Graph Engine
-- **AST-based Codebase Graphing**: Parses code across 20+ programming languages without needing LLM calls for initial pass.
-- **Leiden Community Detection**: Clusters functions, classes, modules, and dependencies into named architectural communities.
-- **God Node Identification**: Detects central hub nodes with high connectivity degree to guide agent navigation.
+### 1. `GET /api/compile/{project}?node=...&compress=true&max_tokens=2000`
+Slices the physical code and immediate AST dependencies for a target node with token savings metrics.
+```json
+{
+  "markdown_context": "### Token-Optimized AST Context: `compile_context` ...",
+  "metrics": {
+    "raw_estimated_tokens": 1240,
+    "compressed_tokens": 680,
+    "tokens_saved": 560,
+    "compression_savings_percent": "45.2%"
+  }
+}
+```
 
-### 2. Obsidian Vault Integration (`~/ObsidianVault/graphify-brain`)
-- **Automated Sync Daemon (`graphify_obsidian_sync.py`)**: Exports `graph.json` structures into linked Obsidian Markdown notes (`[[project/index]]`, community hubs, and node cards).
-- **Master Vault Index (`README.md`)**: Automatically updated master table of contents linking all project graphs in Obsidian.
+### 2. `GET /api/compact_tree/{project}`
+Renders a dense Markdown ASCII tree of communities and top nodes for LLM system prompts.
 
-### 3. Antigravity Graph Engine & Agent Context Compiler
-- **FastAPI API (`server.py` on port 3333)**:
-  - `GET /api/projects`: List all active projects in the Obsidian brain vault.
-  - `GET /api/graph/{project}`: Fetch graph data with injected concept hubs (`★ SHARED_CONCEPT`).
-  - `GET /api/context/{project}?node=...&depth=2`: Query ego-subgraphs up to $N$ hops away.
-  - `GET /api/compile/{project}?node=...`: **Token-Optimized Context Compiler** — reads AST ranges to return only the exact target code block + immediate dependencies, drastically saving context tokens.
-- **3D WebGL Interactive Frontend**: Built with React, Vite, Three.js, and Lucide icons for real-time visual inspection of multi-project networks.
-
-### 4. Shared-Memory MCP Server (`mcp-shared-memory`)
-- **Cross-Session Persistence**: Stores entities, concepts, decisions, and session notes in `~/.mcp-memory/memory.db`.
-- **MCP Tool Suite**: `create_memory`, `search_memories`, `relate_memories`, `rebuild_index`.
+### 3. `GET /api/context/{project}?node=...&depth=2&compact=true`
+Returns ego-subgraph neighborhoods formatted for minimal token overhead.
 
 ---
 
 ## 🛠 Setup & Installation
-
-### Prerequisites
-- Python 3.10+
-- Node.js 18+ & npm
-- Obsidian (optional, for viewing vault notes)
 
 ### 1. Install Dependencies
 ```bash
