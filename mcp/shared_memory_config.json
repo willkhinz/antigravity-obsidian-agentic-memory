@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "shared-memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-shared-memory"
+      ],
+      "env": {
+        "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    }
+  },
+  "storagePath": "~/.mcp-memory",
+  "tools": [
+    "build_memory_store",
+    "create_memory",
+    "update_memory",
+    "delete_memory",
+    "get_memory",
+    "search_memories",
+    "list_memories",
+    "add_tags",
+    "remove_tags",
+    "relate_memories",
+    "unrelate_memories",
+    "rebuild_index",
+    "whats_new",
+    "check_updates"
+  ]
+}
